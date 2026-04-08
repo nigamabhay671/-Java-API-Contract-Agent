@@ -1,0 +1,155 @@
+================================================================================
+  JAVA API CONTRACT AGENT - IMPROVED FOLDER STRUCTURE
+  Version 2.0 - Restructured on April 8, 2026
+================================================================================
+
+PROJECT ROOT: Java-API-Contract-Agent/
+
+📁 MAIN DIRECTORIES
+================================================================================
+
+/bin/                          Scripts & Executables
+  ├── generate-java-api.ps1   → Windows PowerShell script
+  ├── generate-java-api.sh    → Linux/Mac Bash script
+  └── README.md               → Scripts documentation
+
+/templates/                    AI Prompt Templates
+  └── java-agent-prompt.md    → Main Java agent system prompt
+
+/examples/                     Sample OpenAPI Contracts
+  ├── order-management-api.yaml → Order management example
+  └── test.yaml                  → Test contract
+
+/config/                       Configuration Files
+  └── java-agent-config.json  → Agent configuration
+
+/generated/                    Generated Projects Output
+  ├── last-java-generation-prompt.txt → Most recent prompt
+  ├── README.md                        → Generated folder guide
+  └── [your-projects]/                 → Generated Spring Boot projects
+
+/docs/                         Documentation
+  ├── QUICKSTART.md           → Quick start guide
+  ├── JAVA_AGENT_SUMMARY.md   → Detailed documentation
+  └── USAGE_GUIDE.md          → Usage examples
+
+/.archive/                     Backup & Old Files
+  ├── generate-java-api-backup.ps1
+  └── generate-java-api-corrupt.ps1.bak
+
+================================================================================
+📄 ROOT FILES
+================================================================================
+
+README.md                      → Main project documentation
+PROJECT_STRUCTURE.md           → Detailed folder structure guide
+CHANGELOG.md                   → Version history and changes
+.gitignore                     → Git ignore rules
+STRUCTURE_SUMMARY.txt          → This file
+
+================================================================================
+🎯 KEY IMPROVEMENTS
+================================================================================
+
+✅ Organized Structure
+   - Logical separation of scripts, templates, output, and docs
+   - Clear purpose for each directory
+
+✅ Better Navigation
+   - Easy to find scripts in /bin/
+   - Documentation centralized in /docs/
+   - Generated projects isolated in /generated/
+
+✅ Cleaner Root
+   - Only essential files in root
+   - No clutter from temporary/backup files
+
+✅ Enhanced Documentation
+   - Individual READMEs in key folders
+   - Comprehensive PROJECT_STRUCTURE.md
+   - Updated main README with new paths
+
+✅ Improved .gitignore
+   - Well-organized with comments
+   - Ignores generated projects but keeps prompts
+   - Handles all common IDEs and OS files
+
+================================================================================
+🚀 QUICK START
+================================================================================
+
+From project root:
+
+  # Windows
+  .\bin\generate-java-api.ps1 `
+    -ContractPath ".\examples\order-management-api.yaml" `
+    -ProjectName "Order Management API"
+
+  # Linux/Mac
+  ./bin/generate-java-api.sh \
+    --contract ./examples/order-management-api.yaml \
+    --project "Order Management API"
+
+Output will be in: generated/your-project-name/
+
+================================================================================
+📊 DIRECTORY STATISTICS
+================================================================================
+
+Total Directories: 7 main folders
+  - bin/          → 3 files (2 scripts + README)
+  - templates/    → 1 file
+  - examples/     → 2 files
+  - config/       → 1 file
+  - generated/    → 2 files (README + prompts)
+  - docs/         → 3+ files
+  - .archive/     → 2 files (backups)
+
+Total Documentation: 6 markdown files
+  - README.md (main)
+  - PROJECT_STRUCTURE.md
+  - CHANGELOG.md
+  - bin/README.md
+  - generated/README.md
+  - docs/QUICKSTART.md
+
+================================================================================
+🔗 IMPORTANT PATHS
+================================================================================
+
+Scripts:
+  Windows:  .\bin\generate-java-api.ps1
+  Linux:    ./bin/generate-java-api.sh
+
+Templates:
+  Main:     .\templates\java-agent-prompt.md
+
+Examples:
+  Sample:   .\examples\order-management-api.yaml
+
+Output:
+  Default:  .\generated\
+
+Docs:
+  Main:     .\README.md
+  Detailed: .\PROJECT_STRUCTURE.md
+  Changes:  .\CHANGELOG.md
+
+================================================================================
+✨ NEXT STEPS
+================================================================================
+
+1. Read the main README.md for overview
+2. Check PROJECT_STRUCTURE.md for details
+3. Try the Quick Start example above
+4. Explore examples/ folder for sample contracts
+5. Read docs/QUICKSTART.md for step-by-step guide
+
+================================================================================
+
+For more information, see:
+- README.md
+- PROJECT_STRUCTURE.md
+- docs/QUICKSTART.md
+
+================================================================================
