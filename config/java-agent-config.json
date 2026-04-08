@@ -5,7 +5,7 @@
   "language": "Java",
   "framework": "Spring Boot",
   "defaultSettings": {
-    "javaVersion": "17",
+    "javaVersion": "21",
     "springBootVersion": "3.2.0",
     "buildTool": "Maven",
     "packageStructure": "com.example",
@@ -21,7 +21,7 @@
   },
   "javaVersions": {
     "supported": ["17", "21"],
-    "recommended": "17"
+    "recommended": "21"
   },
   "buildTools": {
     "maven": {
