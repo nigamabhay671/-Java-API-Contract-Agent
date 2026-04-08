@@ -15,10 +15,12 @@ CONTRACT_PATH=""
 PROJECT_NAME=""
 GROUP_ID="com.example"
 ARTIFACT_ID=""
-JAVA_VERSION="17"
+JAVA_VERSION="21"
 SPRING_BOOT_VERSION="3.2.0"
 BUILD_TOOL="Maven"
 OUTPUT_PATH="./generated-api"
+MODE="Full"
+EXISTING_PROJECT_PATH=""
 INCLUDE_LOMBOK=true
 INCLUDE_MAPSTRUCT=true
 INTERACTIVE=false
@@ -37,10 +39,12 @@ show_help() {
     echo "  -p, --project NAME       Project name (e.g., 'Order Management API')"
     echo "  -g, --group ID           Maven group ID (default: com.example)"
     echo "  -a, --artifact ID        Maven artifact ID (generated from project name)"
-    echo "  -j, --java VERSION       Java version: 17 or 21 (default: 17)"
+    echo "  -j, --java VERSION       Java version: 17 or 21 (default: 21)"
     echo "  -s, --spring VERSION     Spring Boot version (default: 3.2.0)"
     echo "  -b, --build TOOL         Maven or Gradle (default: Maven)"
     echo "  -o, --output PATH        Output directory (default: ./generated-api)"
+    echo "  -m, --mode MODE          Full or Incremental (default: Full)"
+    echo "  -x, --existing PATH      Path to existing project (required for Incremental)"
     echo "  -i, --interactive        Run in interactive mode"
     echo "  -h, --help               Display this help message"
     echo ""
@@ -50,6 +54,9 @@ show_help() {
     echo ""
     echo "  # With custom group and artifact"
     echo "  ./generate-java-api.sh -c ./api.yaml -p 'My API' -g com.mycompany -a my-api"
+    echo ""
+    echo "  # Incremental: Add endpoint to existing project"
+    echo "  ./generate-java-api.sh -c ./new-endpoint.yaml -p 'My API' -m Incremental -x ./my-api"
     echo ""
     echo "  # Interactive mode"
     echo "  ./generate-java-api.sh -i"
@@ -92,6 +99,14 @@ while [[ $# -gt 0 ]]; do
             OUTPUT_PATH="$2"
             shift 2
             ;;
+        -m|--mode)
+            MODE="$2"
+            shift 2
+            ;;
+        -x|--existing)
+            EXISTING_PROJECT_PATH="$2"
+            shift 2
+            ;;
         -i|--interactive)
             INTERACTIVE=true
             shift
@@ -115,12 +130,50 @@ echo -e "${CYAN}║   Spring Boot REST API Generator                           �
 echo -e "${CYAN}╚════════════════════════════════════════════════════════════╝${NC}"
 echo ""
 
+# Check prerequisites
+echo -e "${YELLOW}🔍 Checking prerequisites...${NC}"
+
+# Check Java
+if command -v java &> /dev/null; then
+    JAVA_VER=$(java -version 2>&1 | head -n 1)
+    echo -e "${GREEN}✓ Java found: $JAVA_VER${NC}"
+else
+    echo -e "${YELLOW}⚠️  Warning: Java not found in PATH${NC}"
+    echo -e "${YELLOW}   Please install Java 17 or 21 from https://adoptium.net/${NC}"
+fi
+
+# Check Maven
+if command -v mvn &> /dev/null; then
+    MVN_VER=$(mvn -version 2>&1 | head -n 1)
+    echo -e "${GREEN}✓ Maven found: $MVN_VER${NC}"
+else
+    echo -e "${YELLOW}⚠️  Warning: Maven not found in PATH${NC}"
+    echo -e "${YELLOW}   Maven is required to build generated projects${NC}"
+fi
+
+echo ""
+
 # Interactive mode
 if [ "$INTERACTIVE" = true ]; then
     echo -e "${GREEN}🤖 Running in Interactive Mode${NC}"
     echo ""
 
     read -p "Enter path to OpenAPI contract file: " CONTRACT_PATH
+
+    echo ""
+    echo -e "${YELLOW}Generation Mode:${NC}"
+    echo "  1. Full - Generate complete new project (Recommended)"
+    echo "  2. Incremental - Add endpoints to existing project"
+    read -p "Select generation mode (1-2, default: 1): " mode_choice
+    case $mode_choice in
+        2) MODE="Incremental" ;;
+        *) MODE="Full" ;;
+    esac
+
+    if [ "$MODE" = "Incremental" ]; then
+        echo ""
+        read -p "Enter path to existing project: " EXISTING_PROJECT_PATH
+    fi
 
     echo ""
     read -p "Enter project name (e.g., 'Order Management API'): " PROJECT_NAME
@@ -133,12 +186,12 @@ if [ "$INTERACTIVE" = true ]; then
 
     echo ""
     echo -e "${YELLOW}Java Version:${NC}"
-    echo "  1. Java 17 (LTS) - Recommended"
-    echo "  2. Java 21 (LTS)"
+    echo "  1. Java 21 (LTS) - Recommended"
+    echo "  2. Java 17 (LTS)"
     read -p "Select Java version (1-2, default: 1): " java_choice
     case $java_choice in
-        2) JAVA_VERSION="21" ;;
-        *) JAVA_VERSION="17" ;;
+        2) JAVA_VERSION="17" ;;
+        *) JAVA_VERSION="21" ;;
     esac
 
     echo ""
@@ -176,6 +229,33 @@ if [ ! -f "$CONTRACT_PATH" ]; then
     exit 1
 fi
 
+# Validate Java version
+if [ "$JAVA_VERSION" != "17" ] && [ "$JAVA_VERSION" != "21" ]; then
+    echo -e "${RED}❌ Error: Invalid Java version '$JAVA_VERSION'${NC}"
+    echo -e "${YELLOW}Supported versions: 17, 21${NC}"
+    exit 1
+fi
+
+# Validate incremental mode
+if [ "$MODE" = "Incremental" ]; then
+    if [ -z "$EXISTING_PROJECT_PATH" ]; then
+        echo -e "${RED}❌ Error: ExistingProjectPath is required for Incremental mode${NC}"
+        exit 1
+    fi
+
+    if [ ! -d "$EXISTING_PROJECT_PATH" ]; then
+        echo -e "${RED}❌ Error: Existing project path not found: $EXISTING_PROJECT_PATH${NC}"
+        exit 1
+    fi
+
+    # Check if it's a Spring Boot project
+    if [ ! -f "$EXISTING_PROJECT_PATH/pom.xml" ] && [ ! -f "$EXISTING_PROJECT_PATH/build.gradle" ]; then
+        echo -e "${RED}❌ Error: No pom.xml or build.gradle found in: $EXISTING_PROJECT_PATH${NC}"
+        echo -e "${YELLOW}This doesn't appear to be a Maven or Gradle project${NC}"
+        exit 1
+    fi
+fi
+
 # Generate artifact ID from project name if not provided
 if [ -z "$ARTIFACT_ID" ]; then
     ARTIFACT_ID=$(echo "$PROJECT_NAME" | tr '[:upper:]' '[:lower:]' | tr ' ' '-' | sed 's/[^a-z0-9-]//g')
@@ -184,8 +264,46 @@ fi
 # Generate package name
 PACKAGE_NAME="$GROUP_ID.$(echo $ARTIFACT_ID | tr '-' '')"
 
+# Analyze existing project if incremental mode
+EXISTING_COMPONENTS=""
+if [ "$MODE" = "Incremental" ]; then
+    echo -e "${YELLOW}📊 Analyzing existing project...${NC}"
+
+    # Find source directory
+    SRC_PATH="$EXISTING_PROJECT_PATH/src/main/java"
+    if [ -d "$SRC_PATH" ]; then
+        CONTROLLERS=$(find "$SRC_PATH" -name "*Controller.java" 2>/dev/null | xargs basename -s .java 2>/dev/null | sed 's/Controller$//' | tr '\n' ', ' | sed 's/,$//')
+        SERVICES=$(find "$SRC_PATH" -name "*Service.java" ! -name "*ServiceImpl.java" 2>/dev/null | xargs basename -s .java 2>/dev/null | sed 's/Service$//' | tr '\n' ', ' | sed 's/,$//')
+        ENTITIES=$(find "$SRC_PATH" -path "*/entity/*.java" 2>/dev/null | xargs basename -s .java 2>/dev/null | tr '\n' ', ' | sed 's/,$//')
+        REPOSITORIES=$(find "$SRC_PATH" -name "*Repository.java" 2>/dev/null | xargs basename -s .java 2>/dev/null | sed 's/Repository$//' | tr '\n' ', ' | sed 's/,$//')
+
+        EXISTING_COMPONENTS="
+
+**Existing Project Components:**
+- Controllers: ${CONTROLLERS:-None}
+- Services: ${SERVICES:-None}
+- Entities: ${ENTITIES:-None}
+- Repositories: ${REPOSITORIES:-None}
+
+**Note:** Generate ONLY new components that don't conflict with existing ones."
+
+        CONTROLLER_COUNT=$(find "$SRC_PATH" -name "*Controller.java" 2>/dev/null | wc -l)
+        SERVICE_COUNT=$(find "$SRC_PATH" -name "*Service.java" 2>/dev/null | wc -l)
+        ENTITY_COUNT=$(find "$SRC_PATH" -path "*/entity/*.java" 2>/dev/null | wc -l)
+
+        echo -e "${GREEN}  Found: $CONTROLLER_COUNT controllers, $SERVICE_COUNT services, $ENTITY_COUNT entities${NC}"
+    else
+        echo -e "${YELLOW}  ⚠️  Warning: Could not find src/main/java in project${NC}"
+    fi
+    echo ""
+fi
+
 # Display configuration
 echo -e "${GREEN}📋 Configuration:${NC}"
+echo "  Mode:              $MODE"
+if [ "$MODE" = "Incremental" ]; then
+    echo "  Existing Project:  $EXISTING_PROJECT_PATH"
+fi
 echo "  Contract:          $CONTRACT_PATH"
 echo "  Project Name:      $PROJECT_NAME"
 echo "  Group ID:          $GROUP_ID"
@@ -212,12 +330,42 @@ if [ ! -f "$AGENT_PROMPT_PATH" ]; then
 fi
 AGENT_PROMPT=$(<"$AGENT_PROMPT_PATH")
 
+# Substitute Java version placeholder
+AGENT_PROMPT="${AGENT_PROMPT//\{JAVA_VERSION\}/$JAVA_VERSION}"
+
+# Build mode-specific instructions
+if [ "$MODE" = "Incremental" ]; then
+    INSTRUCTIONS="Analyze the existing project and generate ONLY new components for endpoints not currently implemented in the OpenAPI contract.
+Preserve all existing code. Add new controllers, services, entities, and DTOs for new resources only.
+Follow existing patterns and naming conventions found in the existing project.
+Show minimal diffs for pom.xml and application.yml updates (add only missing dependencies/config)."
+
+    EXPECTED_OUTPUT="- Analysis report: List existing components vs. new components to generate
+- New Java source files ONLY (new controllers, services, repositories, entities, DTOs, mappers)
+- New unit tests for new controllers and services
+- Diffs for pom.xml (show only additions)
+- Diffs for application.yml (show only additions)
+- Integration instructions: How to add new code to existing project"
+else
+    INSTRUCTIONS="Generate a complete, production-ready Spring Boot REST API following all the Java and Spring Boot best practices defined above."
+
+    EXPECTED_OUTPUT="- Complete Maven/Gradle project structure
+- All Java source files with full implementation
+- Unit tests for all controllers and services
+- Configuration files (pom.xml/build.gradle, application.yml)
+- Documentation (README.md, Javadoc comments)
+- Sample data initialization"
+fi
+
 # Build the full prompt
 FULL_PROMPT="$AGENT_PROMPT
 
 ---
 
 ## CURRENT GENERATION REQUEST
+
+**Generation Mode**: $MODE
+$EXISTING_COMPONENTS
 
 **OpenAPI Contract:**
 \`\`\`yaml
@@ -250,7 +398,10 @@ $PACKAGE_NAME/
 \`\`\`
 
 **Instructions:**
-Generate a complete, production-ready Spring Boot REST API following all the Java and Spring Boot best practices defined above.
+$INSTRUCTIONS
+
+**Expected Output:**
+$EXPECTED_OUTPUT
 
 Generate production-ready code that compiles and runs on first attempt!"
 

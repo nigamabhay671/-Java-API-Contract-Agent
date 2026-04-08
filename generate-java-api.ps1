@@ -15,7 +15,7 @@ param(
     [string]$ArtifactId,
 
     [Parameter(Mandatory=$false)]
-    [string]$JavaVersion = "17",
+    [string]$JavaVersion = "21",
 
     [Parameter(Mandatory=$false)]
     [string]$SpringBootVersion = "3.2.0",
@@ -34,6 +34,13 @@ param(
     [switch]$IncludeMapStruct = $true,
 
     [Parameter(Mandatory=$false)]
+    [ValidateSet("Full", "Incremental")]
+    [string]$Mode = "Full",
+
+    [Parameter(Mandatory=$false)]
+    [string]$ExistingProjectPath,
+
+    [Parameter(Mandatory=$false)]
     [switch]$Interactive,
 
     [Parameter(Mandatory=$false)]
@@ -50,18 +57,20 @@ if ($Help) {
     Write-Host "  .\generate-java-api.ps1 [OPTIONS]"
     Write-Host ""
     Write-Host "PARAMETERS:" -ForegroundColor Yellow
-    Write-Host "  -ContractPath       Path to OpenAPI/Swagger contract file"
-    Write-Host "  -ProjectName        Project name (e.g., Order Management API)"
-    Write-Host "  -GroupId            Maven group ID (default: com.example)"
-    Write-Host "  -ArtifactId         Maven artifact ID (default: from ProjectName)"
-    Write-Host "  -JavaVersion        Java version: 17 or 21 (default: 17)"
-    Write-Host "  -SpringBootVersion  Spring Boot version (default: 3.2.0)"
-    Write-Host "  -BuildTool          Maven or Gradle (default: Maven)"
-    Write-Host "  -OutputPath         Output directory (default: ./generated-api)"
-    Write-Host "  -IncludeLombok      Include Lombok (default: true)"
-    Write-Host "  -IncludeMapStruct   Include MapStruct (default: true)"
-    Write-Host "  -Interactive        Run in interactive mode"
-    Write-Host "  -Help               Display this help message"
+    Write-Host "  -ContractPath          Path to OpenAPI/Swagger contract file"
+    Write-Host "  -ProjectName           Project name (e.g., Order Management API)"
+    Write-Host "  -GroupId               Maven group ID (default: com.example)"
+    Write-Host "  -ArtifactId            Maven artifact ID (default: from ProjectName)"
+    Write-Host "  -JavaVersion           Java version: 17 or 21 (default: 21)"
+    Write-Host "  -SpringBootVersion     Spring Boot version (default: 3.2.0)"
+    Write-Host "  -BuildTool             Maven or Gradle (default: Maven)"
+    Write-Host "  -OutputPath            Output directory (default: ./generated-api)"
+    Write-Host "  -Mode                  Full or Incremental (default: Full)"
+    Write-Host "  -ExistingProjectPath   Path to existing project (required for Incremental mode)"
+    Write-Host "  -IncludeLombok         Include Lombok (default: true)"
+    Write-Host "  -IncludeMapStruct      Include MapStruct (default: true)"
+    Write-Host "  -Interactive           Run in interactive mode"
+    Write-Host "  -Help                  Display this help message"
     Write-Host ""
     Write-Host "EXAMPLES:" -ForegroundColor Yellow
     Write-Host "  # Basic generation"
@@ -76,6 +85,9 @@ if ($Help) {
     Write-Host "  # With Gradle"
     Write-Host "  .\generate-java-api.ps1 -ContractPath .\api.yaml -ProjectName 'Product API' -BuildTool Gradle"
     Write-Host ""
+    Write-Host "  # Incremental: Add endpoint to existing project"
+    Write-Host "  .\generate-java-api.ps1 -ContractPath .\new-endpoint.yaml -ProjectName 'My API' -Mode Incremental -ExistingProjectPath .\my-api"
+    Write-Host ""
     exit 0
 }
 
@@ -87,12 +99,47 @@ Write-Host "║   Spring Boot REST API Generator                           ║" 
 Write-Host "╚════════════════════════════════════════════════════════════╝" -ForegroundColor Cyan
 Write-Host ""
 
+# Check prerequisites
+Write-Host "🔍 Checking prerequisites..." -ForegroundColor Yellow
+
+# Check Java
+try {
+    $javaVersion = java -version 2>&1 | Select-Object -First 1
+    Write-Host "✓ Java found: $javaVersion" -ForegroundColor Green
+} catch {
+    Write-Host "⚠️  Warning: Java not found in PATH" -ForegroundColor Yellow
+    Write-Host "   Please install Java 17 or 21 from https://adoptium.net/" -ForegroundColor Yellow
+}
+
+# Check Maven
+try {
+    $mavenVersion = mvn -version 2>&1 | Select-Object -First 1
+    Write-Host "✓ Maven found: $mavenVersion" -ForegroundColor Green
+} catch {
+    Write-Host "⚠️  Warning: Maven not found in PATH" -ForegroundColor Yellow
+    Write-Host "   Maven is required to build generated projects" -ForegroundColor Yellow
+}
+
+Write-Host ""
+
 # Interactive mode
 if ($Interactive) {
     Write-Host "🤖 Running in Interactive Mode" -ForegroundColor Green
     Write-Host ""
 
     $ContractPath = Read-Host "Enter path to OpenAPI contract file"
+
+    Write-Host ""
+    Write-Host "Generation Mode:" -ForegroundColor Yellow
+    Write-Host "  1. Full - Generate complete new project (Recommended)"
+    Write-Host "  2. Incremental - Add endpoints to existing project"
+    $modeChoice = Read-Host "Select generation mode (1-2, default: 1)"
+    $Mode = if ($modeChoice -eq "2") { "Incremental" } else { "Full" }
+
+    if ($Mode -eq "Incremental") {
+        Write-Host ""
+        $ExistingProjectPath = Read-Host "Enter path to existing project"
+    }
 
     Write-Host ""
     $ProjectName = Read-Host "Enter project name (e.g., 'Order Management API')"
@@ -105,10 +152,10 @@ if ($Interactive) {
 
     Write-Host ""
     Write-Host "Java Version:" -ForegroundColor Yellow
-    Write-Host "  1. Java 17 (LTS) - Recommended"
-    Write-Host "  2. Java 21 (LTS)"
+    Write-Host "  1. Java 21 (LTS) - Recommended"
+    Write-Host "  2. Java 17 (LTS)"
     $javaChoice = Read-Host "Select Java version (1-2, default: 1)"
-    $JavaVersion = if ($javaChoice -eq "2") { "21" } else { "17" }
+    $JavaVersion = if ($javaChoice -eq "2") { "17" } else { "21" }
 
     Write-Host ""
     Write-Host "Build Tool:" -ForegroundColor Yellow
@@ -142,6 +189,36 @@ if (-not (Test-Path $ContractPath)) {
     exit 1
 }
 
+# Validate Java version
+if ($JavaVersion -ne "17" -and $JavaVersion -ne "21") {
+    Write-Host "❌ Error: Invalid Java version '$JavaVersion'" -ForegroundColor Red
+    Write-Host "Supported versions: 17, 21" -ForegroundColor Yellow
+    exit 1
+}
+
+# Validate incremental mode
+if ($Mode -eq "Incremental") {
+    if ([string]::IsNullOrWhiteSpace($ExistingProjectPath)) {
+        Write-Host "❌ Error: ExistingProjectPath is required for Incremental mode" -ForegroundColor Red
+        exit 1
+    }
+
+    if (-not (Test-Path $ExistingProjectPath)) {
+        Write-Host "❌ Error: Existing project path not found: $ExistingProjectPath" -ForegroundColor Red
+        exit 1
+    }
+
+    # Check if it's a Spring Boot project
+    $hasMaven = Test-Path (Join-Path $ExistingProjectPath "pom.xml")
+    $hasGradle = Test-Path (Join-Path $ExistingProjectPath "build.gradle")
+
+    if (-not $hasMaven -and -not $hasGradle) {
+        Write-Host "❌ Error: No pom.xml or build.gradle found in: $ExistingProjectPath" -ForegroundColor Red
+        Write-Host "This doesn't appear to be a Maven or Gradle project" -ForegroundColor Yellow
+        exit 1
+    }
+}
+
 # Generate artifact ID from project name if not provided
 if ([string]::IsNullOrWhiteSpace($ArtifactId)) {
     $ArtifactId = $ProjectName.ToLower() -replace '\s+', '-' -replace '[^a-z0-9-]', ''
@@ -150,8 +227,70 @@ if ([string]::IsNullOrWhiteSpace($ArtifactId)) {
 # Generate package name from group ID and artifact ID
 $packageName = "$GroupId.$($ArtifactId -replace '-', '')"
 
+# Analyze existing project if incremental mode
+$existingComponents = ""
+if ($Mode -eq "Incremental") {
+    Write-Host "📊 Analyzing existing project..." -ForegroundColor Yellow
+
+    # Find source directory
+    $srcPath = Join-Path $ExistingProjectPath "src\main\java"
+    if (Test-Path $srcPath) {
+        $controllers = @()
+        $services = @()
+        $entities = @()
+        $repositories = @()
+
+        # Find controllers
+        $controllerFiles = Get-ChildItem -Path $srcPath -Recurse -Filter "*Controller.java" 2>$null
+        foreach ($file in $controllerFiles) {
+            $controllers += $file.BaseName -replace 'Controller$', ''
+        }
+
+        # Find services
+        $serviceFiles = Get-ChildItem -Path $srcPath -Recurse -Filter "*Service.java" 2>$null
+        foreach ($file in $serviceFiles) {
+            $services += $file.BaseName -replace 'Service.*$', ''
+        }
+
+        # Find entities
+        $entityFiles = Get-ChildItem -Path $srcPath -Recurse -Filter "*.java" -Exclude "*Controller.java","*Service*.java","*Repository.java","*Dto.java","*Request.java","*Response.java" 2>$null
+        foreach ($file in $entityFiles) {
+            if ($file.DirectoryName -match '\\entity\\?$') {
+                $entities += $file.BaseName
+            }
+        }
+
+        # Find repositories
+        $repoFiles = Get-ChildItem -Path $srcPath -Recurse -Filter "*Repository.java" 2>$null
+        foreach ($file in $repoFiles) {
+            $repositories += $file.BaseName -replace 'Repository$', ''
+        }
+
+        # Build existing components summary
+        $existingComponents = @"
+
+**Existing Project Components:**
+- Controllers: $($controllers -join ', ' | ForEach-Object { if ($_ -eq '') { 'None' } else { $_ } })
+- Services: $($services -join ', ' | ForEach-Object { if ($_ -eq '') { 'None' } else { $_ } })
+- Entities: $($entities -join ', ' | ForEach-Object { if ($_ -eq '') { 'None' } else { $_ } })
+- Repositories: $($repositories -join ', ' | ForEach-Object { if ($_ -eq '') { 'None' } else { $_ } })
+
+**Note:** Generate ONLY new components that don't conflict with existing ones.
+"@
+
+        Write-Host "  Found: $($controllers.Count) controllers, $($services.Count) services, $($entities.Count) entities" -ForegroundColor Green
+    } else {
+        Write-Host "  ⚠️  Warning: Could not find src/main/java in project" -ForegroundColor Yellow
+    }
+    Write-Host ""
+}
+
 # Display configuration
 Write-Host "📋 Configuration:" -ForegroundColor Green
+Write-Host "  Mode:              $Mode"
+if ($Mode -eq "Incremental") {
+    Write-Host "  Existing Project:  $ExistingProjectPath"
+}
 Write-Host "  Contract:          $ContractPath"
 Write-Host "  Project Name:      $ProjectName"
 Write-Host "  Group ID:          $GroupId"
@@ -177,6 +316,9 @@ if (-not (Test-Path $agentPromptPath)) {
 }
 $agentPrompt = Get-Content -Path $agentPromptPath -Raw
 
+# Substitute Java version placeholder
+$agentPrompt = $agentPrompt -replace '\{JAVA_VERSION\}', $JavaVersion
+
 # Build the full prompt
 $fullPrompt = @"
 $agentPrompt
@@ -184,6 +326,9 @@ $agentPrompt
 ---
 
 ## CURRENT GENERATION REQUEST
+
+**Generation Mode**: $Mode
+$existingComponents
 
 **OpenAPI Contract:**
 ``````yaml
@@ -218,7 +363,14 @@ $packageName/
 ``````
 
 **Instructions:**
-Generate a complete, production-ready Spring Boot REST API following all the Java and Spring Boot best practices defined above.
+$(if ($Mode -eq "Incremental") {
+"Analyze the existing project and generate ONLY new components for endpoints not currently implemented in the OpenAPI contract.
+Preserve all existing code. Add new controllers, services, entities, and DTOs for new resources only.
+Follow existing patterns and naming conventions found in the existing project.
+Show minimal diffs for pom.xml and application.yml updates (add only missing dependencies/config)."
+} else {
+"Generate a complete, production-ready Spring Boot REST API following all the Java and Spring Boot best practices defined above."
+})
 
 **Requirements:**
 1. Use Java $JavaVersion with Spring Boot $SpringBootVersion
@@ -238,19 +390,29 @@ Generate a complete, production-ready Spring Boot REST API following all the Jav
 15. Include README.md with build and run instructions
 
 **Expected Output:**
-- Complete Maven/Gradle project structure
+$(if ($Mode -eq "Incremental") {
+"- Analysis report: List existing components vs. new components to generate
+- New Java source files ONLY (new controllers, services, repositories, entities, DTOs, mappers)
+- New unit tests for new controllers and services
+- Diffs for pom.xml (show only additions)
+- Diffs for application.yml (show only additions)
+- Integration instructions: How to add new code to existing project"
+} else {
+"- Complete Maven/Gradle project structure
 - All Java source files with full implementation
 - Unit tests for all controllers and services
 - Configuration files (pom.xml/build.gradle, application.yml)
 - Documentation (README.md, Javadoc comments)
-- Sample data initialization
+- Sample data initialization"
+})
 
 Generate production-ready code that compiles and runs on first attempt!
 "@
 
-# Save prompt to file
+# Save prompt to file (UTF-8 without BOM for cross-platform compatibility)
 $promptFile = Join-Path $PSScriptRoot "last-java-generation-prompt.txt"
-$fullPrompt | Out-File -FilePath $promptFile -Encoding UTF8
+$utf8NoBom = New-Object System.Text.UTF8Encoding $false
+[System.IO.File]::WriteAllText($promptFile, $fullPrompt, $utf8NoBom)
 
 Write-Host "✅ Java API generation prompt prepared" -ForegroundColor Green
 Write-Host ""

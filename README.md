@@ -8,7 +8,7 @@ A dedicated AI agent system that generates complete, production-ready **Spring B
 
 ## ✨ Features
 
-- ☕ **Java 17/21** - Modern Java LTS versions
+- ☕ **Java 21/17** - Modern Java LTS versions (21 recommended)
 - 🍃 **Spring Boot 3.2.x** - Latest stable framework
 - 🏗️ **Layered Architecture** - Controller, Service, Repository, Entity, DTO
 - 📦 **Maven/Gradle** - Choose your build tool
@@ -89,7 +89,7 @@ Follow the prompts, then paste the generated prompt to your AI assistant!
   -ProjectName "Product API" `
   -GroupId "com.mycompany" `
   -ArtifactId "product-api" `
-  -JavaVersion "17" `
+  -JavaVersion "21" `
   -BuildTool "Maven"
 ```
 
@@ -101,6 +101,32 @@ Follow the prompts, then paste the generated prompt to your AI assistant!
   -p "Inventory API" \
   -b Gradle
 ```
+
+### Incremental Generation (Add Endpoints to Existing Project)
+
+**Windows:**
+```powershell
+.\generate-java-api.ps1 `
+  -ContractPath ".\new-endpoints.yaml" `
+  -ProjectName "My API" `
+  -Mode "Incremental" `
+  -ExistingProjectPath ".\my-existing-api"
+```
+
+**Linux/Mac:**
+```bash
+./generate-java-api.sh \
+  -c ./new-endpoints.yaml \
+  -p "My API" \
+  -m Incremental \
+  -x ./my-existing-api
+```
+
+This mode:
+- Analyzes your existing project structure
+- Generates ONLY new controllers, services, entities for new endpoints
+- Preserves all existing code
+- Shows minimal diffs for configuration updates
 
 ---
 
@@ -332,10 +358,12 @@ class ProductServiceImplTest {
 | `-ProjectName` | Yes | - | Project name (e.g., "Order API") |
 | `-GroupId` | No | `com.example` | Maven group ID |
 | `-ArtifactId` | No | Auto-generated | Maven artifact ID |
-| `-JavaVersion` | No | `17` | Java version (17 or 21) |
+| `-JavaVersion` | No | `21` | Java version (17 or 21) |
 | `-SpringBootVersion` | No | `3.2.0` | Spring Boot version |
 | `-BuildTool` | No | `Maven` | Maven or Gradle |
 | `-OutputPath` | No | `./generated-api` | Output directory |
+| `-Mode` | No | `Full` | Full or Incremental |
+| `-ExistingProjectPath` | No* | - | Path to existing project (*required for Incremental) |
 | `-Interactive` | No | - | Run in interactive mode |
 | `-Help` | No | - | Show help message |
 
@@ -347,10 +375,12 @@ class ProductServiceImplTest {
 | `-p` | `--project` | Yes | Project name |
 | `-g` | `--group` | No | Maven group ID |
 | `-a` | `--artifact` | No | Maven artifact ID |
-| `-j` | `--java` | No | Java version |
+| `-j` | `--java` | No | Java version (default: 21) |
 | `-s` | `--spring` | No | Spring Boot version |
 | `-b` | `--build` | No | Build tool |
 | `-o` | `--output` | No | Output directory |
+| `-m` | `--mode` | No | Full or Incremental |
+| `-x` | `--existing` | No* | Existing project path (*required for Incremental) |
 | `-i` | `--interactive` | No | Interactive mode |
 | `-h` | `--help` | No | Show help |
 
@@ -476,8 +506,8 @@ See the `examples/` folder for sample OpenAPI contracts:
 # Check Java version
 java -version
 
-# Should be 17 or later
-# Download from: https://adoptium.net/
+# Should be 17 or 21
+# Download Java 21 LTS from: https://adoptium.net/
 ```
 
 ### Maven Issues
@@ -499,16 +529,50 @@ server:
   port: 8081  # Change port
 ```
 
+### Cross-Platform Compatibility
+
+**Windows (PowerShell)**
+- May need to set execution policy: `Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass`
+- Use backslashes in paths: `.\examples\order-api.yaml`
+- Or use Git Bash for Unix-like experience
+
+**Linux/Mac (Bash)**
+- Make script executable: `chmod +x generate-java-api.sh`
+- Use forward slashes in paths: `./examples/order-api.yaml`
+
+**Git Bash on Windows**
+- Can use the bash script: `./generate-java-api.sh`
+- Use forward slashes: `./examples/order-api.yaml`
+- Java and Maven must be in PATH
+
+### Incremental Generation Issues
+
+**"No pom.xml or build.gradle found"**
+- Ensure you're pointing to the root of your Spring Boot project
+- The project must have either pom.xml (Maven) or build.gradle (Gradle)
+
+**"Could not find src/main/java in project"**
+- Project structure must follow standard Maven/Gradle layout
+- Check that src/main/java directory exists
+
+**Conflicts with existing code**
+- Review the generated analysis report
+- Ensure OpenAPI contract doesn't duplicate existing endpoints
+- Manually integrate if there are naming conflicts
+
 ---
 
 ## 💡 Tips
 
-1. **Validate contracts** at [editor.swagger.io](https://editor.swagger.io/)
-2. **Use meaningful operation IDs** - they become method names
-3. **Add descriptions** - they become Javadoc
-4. **Review generated code** before production use
-5. **Replace H2** with PostgreSQL/MySQL for production
-6. **Add security** (Spring Security) before deployment
+1. **Use Java 21** - Latest LTS with modern features (records, pattern matching, virtual threads)
+2. **Validate contracts** at [editor.swagger.io](https://editor.swagger.io/)
+3. **Use meaningful operation IDs** - they become method names
+4. **Add descriptions** - they become Javadoc
+5. **Start with Full mode** - Generate complete project first, then use Incremental for new endpoints
+6. **Review generated code** before production use
+7. **Replace H2** with PostgreSQL/MySQL for production
+8. **Add security** (Spring Security) before deployment
+9. **Test incrementally** - Run tests after each incremental generation to catch conflicts early
 
 ---
 
