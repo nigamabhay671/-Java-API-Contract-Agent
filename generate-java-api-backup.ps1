@@ -49,9 +49,9 @@ param(
 
 # Display help
 if ($Help) {
-    Write-Host "═══════════════════════════════════════════════════════════" -ForegroundColor Cyan
+    Write-Host "â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•" -ForegroundColor Cyan
     Write-Host "  Java API Contract Agent - Spring Boot Generator" -ForegroundColor Cyan
-    Write-Host "═══════════════════════════════════════════════════════════" -ForegroundColor Cyan
+    Write-Host "â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•" -ForegroundColor Cyan
     Write-Host ""
     Write-Host "USAGE:" -ForegroundColor Yellow
     Write-Host "  .\generate-java-api.ps1 [OPTIONS]"
@@ -93,30 +93,30 @@ if ($Help) {
 
 # Banner
 Write-Host ""
-Write-Host "╔════════════════════════════════════════════════════════════╗" -ForegroundColor Cyan
-Write-Host "║      Java API Contract Agent - v1.0.0                      ║" -ForegroundColor Cyan
-Write-Host "║   Spring Boot REST API Generator                           ║" -ForegroundColor Cyan
-Write-Host "╚════════════════════════════════════════════════════════════╝" -ForegroundColor Cyan
+Write-Host "â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—" -ForegroundColor Cyan
+Write-Host "â•‘      Java API Contract Agent - v1.0.0                      â•‘" -ForegroundColor Cyan
+Write-Host "â•‘   Spring Boot REST API Generator                           â•‘" -ForegroundColor Cyan
+Write-Host "â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•" -ForegroundColor Cyan
 Write-Host ""
 
 # Check prerequisites
-Write-Host "[CHECK] Checking prerequisites..." -ForegroundColor Yellow
+Write-Host "ðŸ” Checking prerequisites..." -ForegroundColor Yellow
 
 # Check Java
 try {
     $javaVersion = java -version 2>&1 | Select-Object -First 1
-    Write-Host "[OK] Java found: $javaVersion" -ForegroundColor Green
+    Write-Host "âœ“ Java found: $javaVersion" -ForegroundColor Green
 } catch {
-    Write-Host "[WARNING] Warning: Java not found in PATH" -ForegroundColor Yellow
+    Write-Host "âš ï¸  Warning: Java not found in PATH" -ForegroundColor Yellow
     Write-Host "   Please install Java 17 or 21 from https://adoptium.net/" -ForegroundColor Yellow
 }
 
 # Check Maven
 try {
     $mavenVersion = mvn -version 2>&1 | Select-Object -First 1
-    Write-Host "[OK] Maven found: $mavenVersion" -ForegroundColor Green
+    Write-Host "âœ“ Maven found: $mavenVersion" -ForegroundColor Green
 } catch {
-    Write-Host "[WARNING] Warning: Maven not found in PATH" -ForegroundColor Yellow
+    Write-Host "âš ï¸  Warning: Maven not found in PATH" -ForegroundColor Yellow
     Write-Host "   Maven is required to build generated projects" -ForegroundColor Yellow
 }
 
@@ -124,7 +124,7 @@ Write-Host ""
 
 # Interactive mode
 if ($Interactive) {
-    Write-Host "[AGENT] Running in Interactive Mode" -ForegroundColor Green
+    Write-Host "ðŸ¤– Running in Interactive Mode" -ForegroundColor Green
     Write-Host ""
 
     $ContractPath = Read-Host "Enter path to OpenAPI contract file"
@@ -173,25 +173,25 @@ if ($Interactive) {
 
 # Validate inputs
 if ([string]::IsNullOrWhiteSpace($ContractPath)) {
-    Write-Host "[ERROR] Error: Contract path is required" -ForegroundColor Red
+    Write-Host "âŒ Error: Contract path is required" -ForegroundColor Red
     Write-Host "Use -Help for usage information" -ForegroundColor Yellow
     exit 1
 }
 
 if ([string]::IsNullOrWhiteSpace($ProjectName)) {
-    Write-Host "[ERROR] Error: Project name is required" -ForegroundColor Red
+    Write-Host "âŒ Error: Project name is required" -ForegroundColor Red
     Write-Host "Use -Help for usage information" -ForegroundColor Yellow
     exit 1
 }
 
 if (-not (Test-Path $ContractPath)) {
-    Write-Host "[ERROR] Error: Contract file not found: $ContractPath" -ForegroundColor Red
+    Write-Host "âŒ Error: Contract file not found: $ContractPath" -ForegroundColor Red
     exit 1
 }
 
 # Validate Java version
 if ($JavaVersion -ne "17" -and $JavaVersion -ne "21") {
-    Write-Host "[ERROR] Error: Invalid Java version '$JavaVersion'" -ForegroundColor Red
+    Write-Host "âŒ Error: Invalid Java version '$JavaVersion'" -ForegroundColor Red
     Write-Host "Supported versions: 17, 21" -ForegroundColor Yellow
     exit 1
 }
@@ -199,12 +199,12 @@ if ($JavaVersion -ne "17" -and $JavaVersion -ne "21") {
 # Validate incremental mode
 if ($Mode -eq "Incremental") {
     if ([string]::IsNullOrWhiteSpace($ExistingProjectPath)) {
-        Write-Host "[ERROR] Error: ExistingProjectPath is required for Incremental mode" -ForegroundColor Red
+        Write-Host "âŒ Error: ExistingProjectPath is required for Incremental mode" -ForegroundColor Red
         exit 1
     }
 
     if (-not (Test-Path $ExistingProjectPath)) {
-        Write-Host "[ERROR] Error: Existing project path not found: $ExistingProjectPath" -ForegroundColor Red
+        Write-Host "âŒ Error: Existing project path not found: $ExistingProjectPath" -ForegroundColor Red
         exit 1
     }
 
@@ -213,7 +213,7 @@ if ($Mode -eq "Incremental") {
     $hasGradle = Test-Path (Join-Path $ExistingProjectPath "build.gradle")
 
     if (-not $hasMaven -and -not $hasGradle) {
-        Write-Host "[ERROR] Error: No pom.xml or build.gradle found in: $ExistingProjectPath" -ForegroundColor Red
+        Write-Host "âŒ Error: No pom.xml or build.gradle found in: $ExistingProjectPath" -ForegroundColor Red
         Write-Host "This doesn't appear to be a Maven or Gradle project" -ForegroundColor Yellow
         exit 1
     }
@@ -230,7 +230,7 @@ $packageName = "$GroupId.$($ArtifactId -replace '-', '')"
 # Analyze existing project if incremental mode
 $existingComponents = ""
 if ($Mode -eq "Incremental") {
-    Write-Host "[ANALYZE] Analyzing existing project..." -ForegroundColor Yellow
+    Write-Host "ðŸ“Š Analyzing existing project..." -ForegroundColor Yellow
 
     # Find source directory
     $srcPath = Join-Path $ExistingProjectPath "src\main\java"
@@ -285,13 +285,13 @@ if ($Mode -eq "Incremental") {
 
         Write-Host "  Found: $($controllers.Count) controllers, $($services.Count) services, $($entities.Count) entities" -ForegroundColor Green
     } else {
-        Write-Host "  [WARNING] Warning: Could not find src/main/java in project" -ForegroundColor Yellow
+        Write-Host "  âš ï¸  Warning: Could not find src/main/java in project" -ForegroundColor Yellow
     }
     Write-Host ""
 }
 
 # Display configuration
-Write-Host "[CONFIG] Configuration:" -ForegroundColor Green
+Write-Host "ðŸ“‹ Configuration:" -ForegroundColor Green
 Write-Host "  Mode:              $Mode"
 if ($Mode -eq "Incremental") {
     Write-Host "  Existing Project:  $ExistingProjectPath"
@@ -310,13 +310,13 @@ Write-Host "  Output Path:       $OutputPath"
 Write-Host ""
 
 # Read contract content
-Write-Host "[READ] Reading contract file..." -ForegroundColor Yellow
+Write-Host "ðŸ“– Reading contract file..." -ForegroundColor Yellow
 $contractContent = Get-Content -Path $ContractPath -Raw
 
 # Load Java agent prompt
 $agentPromptPath = Join-Path $PSScriptRoot "java-agent-prompt.md"
 if (-not (Test-Path $agentPromptPath)) {
-    Write-Host "[ERROR] Error: Agent prompt file not found: $agentPromptPath" -ForegroundColor Red
+    Write-Host "âŒ Error: Agent prompt file not found: $agentPromptPath" -ForegroundColor Red
     exit 1
 }
 $agentPrompt = Get-Content -Path $agentPromptPath -Raw
@@ -355,16 +355,16 @@ $contractContent
 **Package Structure:**
 ``````
 $packageName/
-├── ${ArtifactId}Application.java
-├── controller/
-├── service/
-│   └── impl/
-├── repository/
-├── entity/
-├── dto/
-├── mapper/
-├── exception/
-└── config/
+â”œâ”€â”€ ${ArtifactId}Application.java
+â”œâ”€â”€ controller/
+â”œâ”€â”€ service/
+â”‚   â””â”€â”€ impl/
+â”œâ”€â”€ repository/
+â”œâ”€â”€ entity/
+â”œâ”€â”€ dto/
+â”œâ”€â”€ mapper/
+â”œâ”€â”€ exception/
+â””â”€â”€ config/
 ``````
 
 **Instructions:**
@@ -419,11 +419,11 @@ $promptFile = Join-Path $PSScriptRoot "last-java-generation-prompt.txt"
 $utf8NoBom = New-Object System.Text.UTF8Encoding $false
 [System.IO.File]::WriteAllText($promptFile, $fullPrompt, $utf8NoBom)
 
-Write-Host "[SUCCESS] Java API generation prompt prepared" -ForegroundColor Green
+Write-Host "âœ… Java API generation prompt prepared" -ForegroundColor Green
 Write-Host ""
-Write-Host "╔════════════════════════════════════════════════════════════╗" -ForegroundColor Yellow
-Write-Host "║  NEXT STEPS:                                               ║" -ForegroundColor Yellow
-Write-Host "╚════════════════════════════════════════════════════════════╝" -ForegroundColor Yellow
+Write-Host "â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—" -ForegroundColor Yellow
+Write-Host "â•‘  NEXT STEPS:                                               â•‘" -ForegroundColor Yellow
+Write-Host "â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•" -ForegroundColor Yellow
 Write-Host ""
 Write-Host "The Spring Boot API generation prompt has been prepared:" -ForegroundColor Cyan
 Write-Host "  $promptFile" -ForegroundColor White
@@ -450,13 +450,13 @@ Write-Host ""
 $showPrompt = Read-Host "Would you like to display the prompt now? (y/n)"
 if ($showPrompt -eq "y" -or $showPrompt -eq "Y") {
     Write-Host ""
-    Write-Host "═══════════════════════════════════════════════════════════" -ForegroundColor Cyan
+    Write-Host "â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•" -ForegroundColor Cyan
     Write-Host "SPRING BOOT API GENERATION PROMPT" -ForegroundColor Cyan
-    Write-Host "═══════════════════════════════════════════════════════════" -ForegroundColor Cyan
+    Write-Host "â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•" -ForegroundColor Cyan
     Write-Host ""
     Write-Host $fullPrompt
     Write-Host ""
-    Write-Host "═══════════════════════════════════════════════════════════" -ForegroundColor Cyan
+    Write-Host "â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•" -ForegroundColor Cyan
 }
 
 Write-Host ""

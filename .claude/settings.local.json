@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(powershell -Command \"Get-Content -Path '.\\\\generate-java-api.ps1' -Raw | Out-File -FilePath '.\\\\generate-java-api-backup.ps1' -Encoding UTF8\")",
+      "Bash(powershell -Command '[System.Management.Automation.PSParser]::Tokenize\\(\\(Get-Content -Path '\\\\''.\\\\generate-java-api.ps1'\\\\'' -Raw\\), [ref]$null\\) | Select-Object -First 0; Write-Host '\\\\''File parses successfully'\\\\''')",
+      "Bash(powershell -NoProfile -Command \".\\\\generate-java-api.ps1 -ContractPath '.\\\\examples\\\\order-management-api.yaml' -ProjectName 'Order Management API'\")",
+      "Bash(powershell -Command \"Get-Content -Path '.\\\\generate-java-api.ps1' -Raw | Select-String -Pattern 'Java API agent preparation complete' -Context 2,2\")",
+      "Bash(mv:*)",
+      "Bash(powershell -Command '$content = Get-Content -Path '\\\\''.\\\\generate-java-api.ps1'\\\\'' -Raw -Encoding UTF8; $content | Out-File -FilePath '\\\\''.\\\\generate-java-api-fixed.ps1'\\\\'' -Encoding ASCII -NoNewline; $content | Out-File -FilePath '\\\\''.\\\\generate-java-api-fixed.ps1'\\\\'' -Encoding UTF8')"
+    ]
+  }
+}
