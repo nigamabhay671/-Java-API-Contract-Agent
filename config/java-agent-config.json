@@ -1,0 +1,104 @@
+{
+  "agentName": "Java API Contract Agent",
+  "version": "1.0.0",
+  "description": "Specialized agent for generating Spring Boot REST APIs from OpenAPI contracts",
+  "language": "Java",
+  "framework": "Spring Boot",
+  "defaultSettings": {
+    "javaVersion": "17",
+    "springBootVersion": "3.2.0",
+    "buildTool": "Maven",
+    "packageStructure": "com.example",
+    "outputDirectory": "./generated-api",
+    "architecture": "Layered Architecture",
+    "includeTests": true,
+    "includeSwagger": true,
+    "includeLogging": true,
+    "includeValidation": true,
+    "includeLombok": true,
+    "includeMapStruct": true,
+    "includeActuator": true
+  },
+  "javaVersions": {
+    "supported": ["17", "21"],
+    "recommended": "17"
+  },
+  "buildTools": {
+    "maven": {
+      "version": "3.9.x",
+      "wrapper": true
+    },
+    "gradle": {
+      "version": "8.5",
+      "wrapper": true
+    }
+  },
+  "springBootVersions": {
+    "supported": ["3.2.x", "3.3.x"],
+    "recommended": "3.2.0"
+  },
+  "dependencies": {
+    "core": [
+      "spring-boot-starter-web",
+      "spring-boot-starter-validation",
+      "spring-boot-starter-actuator"
+    ],
+    "database": [
+      "spring-boot-starter-data-jpa",
+      "h2"
+    ],
+    "documentation": [
+      "springdoc-openapi-starter-webmvc-ui"
+    ],
+    "utilities": [
+      "lombok",
+      "mapstruct"
+    ],
+    "testing": [
+      "spring-boot-starter-test",
+      "junit-jupiter",
+      "mockito-core",
+      "rest-assured"
+    ],
+    "logging": [
+      "slf4j-api",
+      "logback-classic"
+    ]
+  },
+  "features": {
+    "layeredArchitecture": true,
+    "solidPrinciples": true,
+    "repositoryPattern": true,
+    "servicePattern": true,
+    "dtoPattern": true,
+    "dependencyInjection": true,
+    "globalExceptionHandling": true,
+    "beanValidation": true,
+    "restController": true,
+    "responseEntity": true,
+    "swagger": true,
+    "actuator": true,
+    "profiles": true,
+    "logging": true,
+    "unitTests": true,
+    "integrationTests": false
+  },
+  "conventions": {
+    "naming": {
+      "classes": "PascalCase",
+      "methods": "camelCase",
+      "variables": "camelCase",
+      "constants": "UPPER_SNAKE_CASE",
+      "packages": "lowercase"
+    },
+    "structure": {
+      "controllers": "controller",
+      "services": "service",
+      "repositories": "repository",
+      "entities": "entity",
+      "dtos": "dto",
+      "exceptions": "exception",
+      "config": "config"
+    }
+  }
+}
