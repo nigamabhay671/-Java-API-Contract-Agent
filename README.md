@@ -4,6 +4,10 @@
 
 A dedicated AI agent system that generates complete, production-ready **Spring Boot** REST APIs from OpenAPI/Swagger specifications following Java best practices and Spring Boot conventions.
 
+[![Java](https://img.shields.io/badge/Java-21%20|%2017-orange.svg)](https://adoptium.net/)
+[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.2.0-brightgreen.svg)](https://spring.io/projects/spring-boot)
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+
 ---
 
 ## ✨ Features
@@ -26,560 +30,328 @@ A dedicated AI agent system that generates complete, production-ready **Spring B
 
 ---
 
+## 📁 Project Structure
+
+```
+Java-API-Contract-Agent/
+├── bin/                    # Executable scripts
+│   ├── generate-java-api.ps1
+│   └── generate-java-api.sh
+├── templates/              # AI prompt templates
+├── examples/               # Sample OpenAPI contracts
+├── config/                 # Configuration files
+├── generated/              # Generated projects output
+├── docs/                   # Documentation
+├── .archive/               # Backup files
+├── README.md               # This file
+└── PROJECT_STRUCTURE.md    # Detailed structure docs
+```
+
+See [PROJECT_STRUCTURE.md](PROJECT_STRUCTURE.md) for detailed folder descriptions.
+
+---
+
 ## 🚀 Quick Start
 
 ### Prerequisites
 
 - **Java 17+** ([Download](https://adoptium.net/))
-- **Maven 3.9+** or **Gradle 8+**
+- **Maven 3.9+** ([Download](https://maven.apache.org/download.cgi))
 - IDE (IntelliJ IDEA, Eclipse, VS Code recommended)
-
-### Installation
-
-1. **Navigate to the agent folder:**
-   ```bash
-   cd java-api-agent
-   ```
-
-2. **Make script executable (Linux/Mac):**
-   ```bash
-   chmod +x generate-java-api.sh
-   ```
 
 ### Generate Your First API
 
-**Windows (PowerShell):**
+#### **Option 1: Interactive Mode (Easiest)**
+
 ```powershell
-.\generate-java-api.ps1 -Interactive
+# Windows
+.\bin\generate-java-api.ps1 -Interactive
+
+# Linux/Mac
+./bin/generate-java-api.sh --interactive
 ```
 
-**Linux/Mac (Bash):**
-```bash
-./generate-java-api.sh -i
-```
+#### **Option 2: Command Line**
 
-Follow the prompts, then paste the generated prompt to your AI assistant!
-
----
-
-## 📋 Command Line Usage
-
-### Basic Generation
-
-**Windows:**
 ```powershell
-.\generate-java-api.ps1 `
+# Windows
+.\bin\generate-java-api.ps1 `
   -ContractPath ".\examples\order-management-api.yaml" `
   -ProjectName "Order Management API"
+
+# Linux/Mac
+./bin/generate-java-api.sh \
+  --contract ./examples/order-management-api.yaml \
+  --project "Order Management API"
 ```
 
-**Linux/Mac:**
-```bash
-./generate-java-api.sh \
-  -c ./examples/order-management-api.yaml \
-  -p "Order Management API"
-```
+#### **Option 3: With Full Options**
 
-### Advanced Options
-
-**With Custom Group and Artifact:**
 ```powershell
-.\generate-java-api.ps1 `
-  -ContractPath ".\my-api.yaml" `
-  -ProjectName "Product API" `
+.\bin\generate-java-api.ps1 `
+  -ContractPath ".\examples\order-management-api.yaml" `
+  -ProjectName "Order Management API" `
   -GroupId "com.mycompany" `
-  -ArtifactId "product-api" `
+  -ArtifactId "order-api" `
   -JavaVersion "21" `
-  -BuildTool "Maven"
+  -BuildTool "Maven" `
+  -OutputPath ".\generated\order-api"
 ```
 
-### Using Gradle
+### What Happens Next?
 
-```bash
-./generate-java-api.sh \
-  -c ./api.yaml \
-  -p "Inventory API" \
-  -b Gradle
-```
-
-### Incremental Generation (Add Endpoints to Existing Project)
-
-**Windows:**
-```powershell
-.\generate-java-api.ps1 `
-  -ContractPath ".\new-endpoints.yaml" `
-  -ProjectName "My API" `
-  -Mode "Incremental" `
-  -ExistingProjectPath ".\my-existing-api"
-```
-
-**Linux/Mac:**
-```bash
-./generate-java-api.sh \
-  -c ./new-endpoints.yaml \
-  -p "My API" \
-  -m Incremental \
-  -x ./my-existing-api
-```
-
-This mode:
-- Analyzes your existing project structure
-- Generates ONLY new controllers, services, entities for new endpoints
-- Preserves all existing code
-- Shows minimal diffs for configuration updates
+1. **Script generates a prompt file**: `generated/last-java-generation-prompt.txt`
+2. **Feed prompt to AI** (Claude Code, ChatGPT, etc.)
+3. **AI generates complete Spring Boot project** in `generated/your-project-name/`
+4. **Build and run:**
+   ```bash
+   cd generated/your-project-name
+   mvn clean install
+   mvn spring-boot:run
+   ```
+5. **Access Swagger UI**: http://localhost:8080/swagger-ui.html
 
 ---
 
-## 📂 Generated Project Structure
+## 📖 Documentation
+
+- **[Quick Start Guide](docs/QUICKSTART.md)** - Get started in 5 minutes
+- **[Project Structure](PROJECT_STRUCTURE.md)** - Folder organization explained
+- **[Java Agent Summary](docs/JAVA_AGENT_SUMMARY.md)** - Detailed agent documentation
+- **[Example Contracts](examples/)** - Sample OpenAPI specifications
+
+---
+
+## 🎯 Usage Examples
+
+### Basic CRUD API
+
+```powershell
+.\bin\generate-java-api.ps1 `
+  -ContractPath ".\examples\order-management-api.yaml" `
+  -ProjectName "Order API"
+```
+
+**Generates:**
+- ✅ Complete Spring Boot project
+- ✅ CRUD endpoints (GET, POST, PUT, DELETE)
+- ✅ JPA entities and repositories
+- ✅ Service layer with business logic
+- ✅ DTOs with validation
+- ✅ MapStruct mappers
+- ✅ Exception handling
+- ✅ Unit tests
+- ✅ Swagger documentation
+- ✅ Sample data
+
+### Custom Configuration
+
+```powershell
+.\bin\generate-java-api.ps1 `
+  -ContractPath ".\examples\user-service.yaml" `
+  -ProjectName "User Service" `
+  -GroupId "com.example" `
+  -ArtifactId "user-service" `
+  -JavaVersion "17" `
+  -SpringBootVersion "3.2.0" `
+  -BuildTool "Gradle" `
+  -OutputPath "C:\Projects\user-service"
+```
+
+### Incremental Mode (Add to Existing Project)
+
+```powershell
+.\bin\generate-java-api.ps1 `
+  -ContractPath ".\examples\new-endpoints.yaml" `
+  -ProjectName "My API" `
+  -Mode "Incremental" `
+  -ExistingProjectPath ".\generated\my-api"
+```
+
+---
+
+## 🛠️ Generated Project Structure
 
 ```
-product-api/
+generated/your-api-name/
 ├── src/
 │   ├── main/
 │   │   ├── java/
-│   │   │   └── com/example/productapi/
-│   │   │       ├── ProductApiApplication.java
-│   │   │       ├── controller/
-│   │   │       │   └── ProductController.java
-│   │   │       ├── service/
-│   │   │       │   ├── ProductService.java
+│   │   │   └── com/example/yourapi/
+│   │   │       ├── YourApiApplication.java
+│   │   │       ├── controller/         # REST endpoints
+│   │   │       ├── service/            # Business logic
 │   │   │       │   └── impl/
-│   │   │       │       └── ProductServiceImpl.java
-│   │   │       ├── repository/
-│   │   │       │   └── ProductRepository.java
-│   │   │       ├── entity/
-│   │   │       │   └── Product.java
-│   │   │       ├── dto/
-│   │   │       │   ├── ProductDto.java
-│   │   │       │   ├── CreateProductRequest.java
-│   │   │       │   └── UpdateProductRequest.java
-│   │   │       ├── mapper/
-│   │   │       │   └── ProductMapper.java
-│   │   │       ├── exception/
-│   │   │       │   ├── ResourceNotFoundException.java
-│   │   │       │   ├── GlobalExceptionHandler.java
-│   │   │       │   └── ErrorResponse.java
-│   │   │       └── config/
-│   │   │           ├── OpenApiConfig.java
-│   │   │           └── AppConfig.java
+│   │   │       ├── repository/         # Data access
+│   │   │       ├── entity/             # JPA entities
+│   │   │       ├── dto/                # Request/Response DTOs
+│   │   │       ├── mapper/             # MapStruct mappers
+│   │   │       ├── exception/          # Exception handling
+│   │   │       └── config/             # Configuration
 │   │   └── resources/
 │   │       ├── application.yml
 │   │       ├── application-dev.yml
-│   │       └── data.sql
+│   │       ├── application-prod.yml
+│   │       └── data.sql                # Sample data
 │   └── test/
-│       └── java/
-│           └── com/example/productapi/
-│               ├── controller/
-│               │   └── ProductControllerTest.java
-│               └── service/
-│                   └── ProductServiceImplTest.java
-├── pom.xml
-├── .gitignore
-├── README.md
-└── RUN_INSTRUCTIONS.md
+│       └── java/                       # Comprehensive tests
+├── pom.xml                             # Maven config
+├── README.md                           # Project documentation
+└── .gitignore
 ```
 
 ---
 
-## 🎯 What Gets Generated
+## 🎨 Customization
 
-### **Source Code**
+### Modify Generation Templates
 
-#### 1. **Main Application Class**
-```java
-@SpringBootApplication
-public class ProductApiApplication {
-    public static void main(String[] args) {
-        SpringApplication.run(ProductApiApplication.class, args);
-    }
-}
-```
+Edit `templates/java-agent-prompt.md` to customize:
 
-#### 2. **REST Controllers**
-```java
-@RestController
-@RequestMapping("/api/products")
-@Validated
-@Slf4j
-@RequiredArgsConstructor
-public class ProductController {
-    private final ProductService productService;
-    
-    @GetMapping
-    public ResponseEntity<List<ProductDto>> getAllProducts() { }
-    
-    @PostMapping
-    public ResponseEntity<ProductDto> createProduct(@Valid @RequestBody CreateProductRequest request) { }
-}
-```
+- Coding standards
+- Architecture patterns
+- Naming conventions
+- Testing strategies
+- Documentation style
 
-#### 3. **Service Layer**
-```java
-public interface ProductService {
-    List<ProductDto> getAllProducts();
-    ProductDto createProduct(CreateProductRequest request);
-}
+### Add New Examples
 
-@Service
-@Slf4j
-@RequiredArgsConstructor
-public class ProductServiceImpl implements ProductService {
-    private final ProductRepository productRepository;
-    private final ProductMapper productMapper;
-    // Implementation...
-}
-```
+Place your OpenAPI YAML files in `examples/`:
 
-#### 4. **JPA Repositories**
-```java
-@Repository
-public interface ProductRepository extends JpaRepository<Product, Long> {
-    List<Product> findByCategory(String category);
-}
-```
-
-#### 5. **JPA Entities**
-```java
-@Entity
-@Table(name = "products")
-@Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-public class Product {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    
-    @Column(nullable = false)
-    private String name;
-    
-    private BigDecimal price;
-}
-```
-
-#### 6. **DTOs with Validation**
-```java
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class CreateProductRequest {
-    @NotBlank(message = "Product name is required")
-    @Size(min = 2, max = 100)
-    private String name;
-    
-    @NotNull
-    @DecimalMin("0.01")
-    private BigDecimal price;
-}
-```
-
-#### 7. **MapStruct Mappers**
-```java
-@Mapper(componentModel = "spring")
-public interface ProductMapper {
-    ProductDto toDto(Product entity);
-    Product toEntity(CreateProductRequest request);
-}
-```
-
-#### 8. **Global Exception Handler**
-```java
-@RestControllerAdvice
-@Slf4j
-public class GlobalExceptionHandler {
-    @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleNotFound(ResourceNotFoundException ex) {
-        // Handle exception...
-    }
-}
-```
-
-### **Configuration**
-
-#### pom.xml
-- Spring Boot Parent
-- All required dependencies
-- Maven plugins configured
-- Java version set
-
-#### application.yml
-- Server configuration
-- Database settings
-- Logging configuration
-- SpringDoc settings
-- Profile-specific configs
-
-### **Tests**
-
-#### Controller Tests (MockMvc)
-```java
-@WebMvcTest(ProductController.class)
-class ProductControllerTest {
-    @Autowired
-    private MockMvc mockMvc;
-    
-    @MockBean
-    private ProductService productService;
-    
-    @Test
-    void createProduct_ReturnsCreated() throws Exception {
-        // Test implementation...
-    }
-}
-```
-
-#### Service Tests (Mockito)
-```java
-@ExtendWith(MockitoExtension.class)
-class ProductServiceImplTest {
-    @Mock
-    private ProductRepository productRepository;
-    
-    @InjectMocks
-    private ProductServiceImpl productService;
-    
-    @Test
-    void getAllProducts_ReturnsProductList() {
-        // Test implementation...
-    }
-}
-```
-
----
-
-## 🔧 Command Line Options
-
-### PowerShell (Windows)
-
-| Parameter | Required | Default | Description |
-|-----------|----------|---------|-------------|
-| `-ContractPath` | Yes | - | Path to OpenAPI contract file |
-| `-ProjectName` | Yes | - | Project name (e.g., "Order API") |
-| `-GroupId` | No | `com.example` | Maven group ID |
-| `-ArtifactId` | No | Auto-generated | Maven artifact ID |
-| `-JavaVersion` | No | `21` | Java version (17 or 21) |
-| `-SpringBootVersion` | No | `3.2.0` | Spring Boot version |
-| `-BuildTool` | No | `Maven` | Maven or Gradle |
-| `-OutputPath` | No | `./generated-api` | Output directory |
-| `-Mode` | No | `Full` | Full or Incremental |
-| `-ExistingProjectPath` | No* | - | Path to existing project (*required for Incremental) |
-| `-Interactive` | No | - | Run in interactive mode |
-| `-Help` | No | - | Show help message |
-
-### Bash (Linux/Mac)
-
-| Short | Long | Required | Description |
-|-------|------|----------|-------------|
-| `-c` | `--contract` | Yes | Path to OpenAPI contract |
-| `-p` | `--project` | Yes | Project name |
-| `-g` | `--group` | No | Maven group ID |
-| `-a` | `--artifact` | No | Maven artifact ID |
-| `-j` | `--java` | No | Java version (default: 21) |
-| `-s` | `--spring` | No | Spring Boot version |
-| `-b` | `--build` | No | Build tool |
-| `-o` | `--output` | No | Output directory |
-| `-m` | `--mode` | No | Full or Incremental |
-| `-x` | `--existing` | No* | Existing project path (*required for Incremental) |
-| `-i` | `--interactive` | No | Interactive mode |
-| `-h` | `--help` | No | Show help |
-
----
-
-## 🛠️ Build and Run
-
-After generation:
-
-### Maven
 ```bash
-cd generated-api
-
-# Build the project
-mvn clean install
-
-# Run tests
-mvn test
-
-# Run the application
-mvn spring-boot:run
+examples/
+├── order-management-api.yaml
+├── user-service-api.yaml        # Add yours here
+└── product-catalog-api.yaml     # Add yours here
 ```
 
-### Gradle
-```bash
-cd generated-api
+### Configure Default Settings
 
-# Build the project
-./gradlew build
+Edit `config/java-agent-config.json`:
 
-# Run tests
-./gradlew test
-
-# Run the application
-./gradlew bootRun
+```json
+{
+  "defaultJavaVersion": "21",
+  "defaultSpringBootVersion": "3.2.0",
+  "defaultBuildTool": "Maven",
+  "includeLombok": true,
+  "includeMapStruct": true
+}
 ```
-
-### Access the API
-
-- **Swagger UI**: `http://localhost:8080/swagger-ui.html`
-- **API Docs**: `http://localhost:8080/api-docs`
-- **H2 Console**: `http://localhost:8080/h2-console`
-- **Actuator Health**: `http://localhost:8080/actuator/health`
 
 ---
 
-## 📚 Technologies Used
+## 📊 Generated Code Quality
 
-| Category | Technology | Version |
-|----------|-----------|---------|
-| Language | Java | 17 / 21 |
-| Framework | Spring Boot | 3.2.x |
-| Build Tool | Maven / Gradle | Latest |
-| Database | H2 (in-memory) | Latest |
-| ORM | Spring Data JPA | 3.2.x |
-| Validation | Hibernate Validator | 8.x |
-| Mapping | MapStruct | 1.5.x |
-| Boilerplate | Lombok | 1.18.x |
-| Documentation | SpringDoc OpenAPI | 2.3.x |
-| Testing | JUnit 5 | 5.10.x |
-| Mocking | Mockito | 5.x |
-| Logging | SLF4J + Logback | Latest |
+✅ **Production-Ready**
+- Compiles on first attempt
+- All tests pass
+- No linting errors
 
----
+✅ **Best Practices**
+- Layered architecture
+- Dependency injection
+- Interface-based design
+- Transaction management
 
-## 🎨 Java Best Practices
-
-Generated code follows:
-
-✅ **Naming Conventions**
-- Classes: PascalCase
-- Methods/Variables: camelCase
-- Constants: UPPER_SNAKE_CASE
-- Packages: lowercase
-
-✅ **Design Patterns**
-- Repository Pattern
-- Service Pattern
-- DTO Pattern
-- Builder Pattern
-- Factory Pattern
-
-✅ **Spring Boot Best Practices**
-- Constructor injection (not field injection)
-- Return ResponseEntity<T> from controllers
-- Use @Validated on controllers
-- Global exception handling
-- Profile-based configuration
-
-✅ **Code Quality**
-- Lombok to reduce boilerplate
-- MapStruct for type-safe mapping
-- Comprehensive Javadoc
+✅ **Security**
+- Input validation
+- SQL injection prevention
 - Proper exception handling
-- Structured logging
+
+✅ **Testing**
+- Controller tests (MockMvc)
+- Service tests (Mockito)
+- >80% code coverage
+
+✅ **Documentation**
+- Javadoc comments
+- Swagger/OpenAPI docs
+- README with examples
 
 ---
 
-## 📖 Examples
+## 🔧 Troubleshooting
 
-See the `examples/` folder for sample OpenAPI contracts:
-- `order-management-api.yaml` - Complete order management system
+### Script Execution Issues
 
----
+**Windows PowerShell Execution Policy:**
+```powershell
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+```
 
-## 🔄 Workflow
+**Linux/Mac Permissions:**
+```bash
+chmod +x bin/generate-java-api.sh
+```
 
-1. **Prepare** your OpenAPI contract
-2. **Run** the agent script
-3. **Copy** the generated prompt
-4. **Paste** to AI assistant (Claude Code)
-5. **Build** the generated project
-6. **Test** with Swagger UI
-7. **Customize** as needed
-8. **Deploy** to production
+### Maven Not Found
 
----
+Ensure Maven is in your PATH:
+```bash
+mvn -version
+```
 
-## 🆘 Troubleshooting
+Download: https://maven.apache.org/download.cgi
 
 ### Java Version Issues
+
+Check your Java version:
 ```bash
-# Check Java version
 java -version
-
-# Should be 17 or 21
-# Download Java 21 LTS from: https://adoptium.net/
 ```
 
-### Maven Issues
-```bash
-# Clean build
-mvn clean
-
-# Update dependencies
-mvn dependency:purge-local-repository
-
-# Rebuild
-mvn install
-```
-
-### Port Already in Use
-Edit `application.yml`:
-```yaml
-server:
-  port: 8081  # Change port
-```
-
-### Cross-Platform Compatibility
-
-**Windows (PowerShell)**
-- May need to set execution policy: `Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass`
-- Use backslashes in paths: `.\examples\order-api.yaml`
-- Or use Git Bash for Unix-like experience
-
-**Linux/Mac (Bash)**
-- Make script executable: `chmod +x generate-java-api.sh`
-- Use forward slashes in paths: `./examples/order-api.yaml`
-
-**Git Bash on Windows**
-- Can use the bash script: `./generate-java-api.sh`
-- Use forward slashes: `./examples/order-api.yaml`
-- Java and Maven must be in PATH
-
-### Incremental Generation Issues
-
-**"No pom.xml or build.gradle found"**
-- Ensure you're pointing to the root of your Spring Boot project
-- The project must have either pom.xml (Maven) or build.gradle (Gradle)
-
-**"Could not find src/main/java in project"**
-- Project structure must follow standard Maven/Gradle layout
-- Check that src/main/java directory exists
-
-**Conflicts with existing code**
-- Review the generated analysis report
-- Ensure OpenAPI contract doesn't duplicate existing endpoints
-- Manually integrate if there are naming conflicts
+Use Java 17 or 21 (LTS versions).
 
 ---
 
-## 💡 Tips
+## 🤝 Contributing
 
-1. **Use Java 21** - Latest LTS with modern features (records, pattern matching, virtual threads)
-2. **Validate contracts** at [editor.swagger.io](https://editor.swagger.io/)
-3. **Use meaningful operation IDs** - they become method names
-4. **Add descriptions** - they become Javadoc
-5. **Start with Full mode** - Generate complete project first, then use Incremental for new endpoints
-6. **Review generated code** before production use
-7. **Replace H2** with PostgreSQL/MySQL for production
-8. **Add security** (Spring Security) before deployment
-9. **Test incrementally** - Run tests after each incremental generation to catch conflicts early
+Contributions are welcome! Please:
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
 ---
 
-## 📄 License
+## 📝 License
 
-This agent template is provided for automated Spring Boot API generation.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ---
 
-**Start generating production-ready Spring Boot APIs today! ☕🚀**
+## 🙏 Acknowledgments
+
+- Spring Boot team for the amazing framework
+- OpenAPI Initiative for API specifications
+- MapStruct team for type-safe mapping
+- Lombok team for reducing boilerplate
+
+---
+
+## 📧 Support
+
+- **Documentation**: See `docs/` folder
+- **Issues**: [GitHub Issues](https://github.com/yourusername/java-api-contract-agent/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/yourusername/java-api-contract-agent/discussions)
+
+---
+
+## 🚀 What's Next?
+
+- [ ] Add GraphQL support
+- [ ] Support for microservices patterns
+- [ ] Docker containerization
+- [ ] Kubernetes deployment manifests
+- [ ] CI/CD pipeline templates
+- [ ] MongoDB support
+- [ ] PostgreSQL/MySQL production configs
+
+---
+
+**Made with ☕ by the Java API Contract Agent Team**
+
+*Generate Spring Boot APIs in seconds, not days!*

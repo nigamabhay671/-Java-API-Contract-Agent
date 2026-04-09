@@ -1,0 +1,184 @@
+# Java API Contract Agent - Git Ignore
+
+# ============================================
+# Generated Projects (except prompts)
+# ============================================
+generated/*/
+!generated/*.txt
+!generated/README.md
+
+# ============================================
+# Build Artifacts
+# ============================================
+*.class
+*.jar
+*.war
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# Maven
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+
+# Gradle
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+
+# ============================================
+# IDEs and Editors
+# ============================================
+
+# IntelliJ IDEA
+.idea/
+*.iws
+*.iml
+*.ipr
+out/
+
+# Eclipse
+.classpath
+.project
+.settings/
+bin/
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# NetBeans
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+# ============================================
+# Operating System Files
+# ============================================
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.lnk
+
+# Linux
+*~
+.directory
+.Trash-*
+
+# ============================================
+# Logs and Databases
+# ============================================
+*.log
+logs/
+*.sql
+*.sqlite
+*.db
+*.h2.db
+
+# ============================================
+# Temporary Files
+# ============================================
+*.tmp
+*.temp
+*.bak
+*.swp
+*.swo
+*~
+.cache/
+*.orig
+
+# ============================================
+# Node.js (if any frontend tools)
+# ============================================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+yarn.lock
+
+# ============================================
+# Python (if any Python scripts)
+# ============================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+ENV/
+env/
+.venv
+
+# ============================================
+# Archive folder (optional - uncomment to ignore)
+# ============================================
+# .archive/
+
+# ============================================
+# Claude Code specific
+# ============================================
+.claude/memory/
+.claude/plans/
+
+# ============================================
+# Secrets and Sensitive Data
+# ============================================
+*.env
+.env.local
+.env.*.local
+secrets.yml
+credentials.json
+*.pem
+*.key
+*.cert
+
+# ============================================
+# Test Coverage Reports
+# ============================================
+coverage/
+*.coverage
+htmlcov/
+.tox/
+.coverage
+.coverage.*
+.pytest_cache/
+junit/
+
+# ============================================
+# Documentation Build
+# ============================================
+docs/_build/
+site/
+
+# ============================================
+# Package Managers
+# ============================================
+.pnpm-debug.log*
