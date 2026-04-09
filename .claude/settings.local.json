@@ -6,7 +6,16 @@
       "Bash(powershell -NoProfile -Command \".\\\\generate-java-api.ps1 -ContractPath '.\\\\examples\\\\order-management-api.yaml' -ProjectName 'Order Management API'\")",
       "Bash(powershell -Command \"Get-Content -Path '.\\\\generate-java-api.ps1' -Raw | Select-String -Pattern 'Java API agent preparation complete' -Context 2,2\")",
       "Bash(mv:*)",
-      "Bash(powershell -Command '$content = Get-Content -Path '\\\\''.\\\\generate-java-api.ps1'\\\\'' -Raw -Encoding UTF8; $content | Out-File -FilePath '\\\\''.\\\\generate-java-api-fixed.ps1'\\\\'' -Encoding ASCII -NoNewline; $content | Out-File -FilePath '\\\\''.\\\\generate-java-api-fixed.ps1'\\\\'' -Encoding UTF8')"
+      "Bash(powershell -Command '$content = Get-Content -Path '\\\\''.\\\\generate-java-api.ps1'\\\\'' -Raw -Encoding UTF8; $content | Out-File -FilePath '\\\\''.\\\\generate-java-api-fixed.ps1'\\\\'' -Encoding ASCII -NoNewline; $content | Out-File -FilePath '\\\\''.\\\\generate-java-api-fixed.ps1'\\\\'' -Encoding UTF8')",
+      "Bash(mkdir:*)",
+      "Bash(mv generate-java-api.ps1 bin/)",
+      "Bash(mv generate-java-api.sh bin/)",
+      "Bash(mv generate-java-api-backup.ps1 .archive/)",
+      "Bash(mv generate-java-api-corrupt.ps1.bak .archive/)",
+      "Bash(mv java-agent-prompt.md templates/)",
+      "Bash(mv java-api-agent/JAVA_AGENT_SUMMARY.md docs/)",
+      "Bash(mv java-api-agent/docs/* docs/)",
+      "Bash(rmdir java-api-agent/docs java-api-agent)"
     ]
   }
 }
